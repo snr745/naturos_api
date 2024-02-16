@@ -466,8 +466,5 @@
         "day": 5
       }
     ]
-  },
-  { "_id": 10, "name": "The test", "duration": 7, "maxGroupSize": 15 },
-  { "_id": 11, "name": "The test", "duration": 7, "maxGroupSize": 15 },
-  { "_id": 12, "name": "The test", "duration": 7, "maxGroupSize": 15 }
+  }
 ]

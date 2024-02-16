@@ -17,6 +17,10 @@ const handleDuplicateErrorFieldDB= err=>{
     return new AppError(message,400);
 }
 
+const handleJsonWeTokenError =  err =>new AppError('Invalid token. Please log in Again',401);
+
+const handleJsonWeTokenTimoutError =  err =>new AppError('Your Token Expired. Please log in Again',401);
+
 const sendErrorDev=(err,res)=>{
     console.log(err.name);
     res.status(err.statusCode).json({
@@ -61,6 +65,12 @@ module.exports=(err,req,res,next)=>{
         }
         else if(err.code ==11000){
             error=handleDuplicateErrorFieldDB(error)
+        }
+        else if(err.name ==="JsonWebTokenError"){
+            error=handleJsonWeTokenError(error);
+        }
+        else if(err.name ==="TokenExpiredError"){
+            error=handleJsonWeTokenTimoutError(error);
         }
         sendErrorProd(error,res);
     }
