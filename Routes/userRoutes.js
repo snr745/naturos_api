@@ -9,7 +9,22 @@ const router=express.Router();
 
 
 router.route('/signup').post(authController.signUp);
-router.route('/').get(userController.getUsers).post(userController.createUser);
+router.route('/logIn').post(authController.logIn);
+router.route('/logout').get(authController.logout);
+
+router.route('/forgotPassword').post(authController.forgotPassword);
+router.route('/updateMyPassword').patch(authController.protect,authController.updatePassword);
+router.route('/resetPassword/:token').patch(authController.resetPassword);
+
+router.use(authController.protect);
+
+router.route('/deleteMe').delete(authController.protect,userController.deleteMe);
+
+router.route('/updateMe').patch(authController.protect,userController.updateUser);
+router.route('/getMe').get(authController.protect,userController.getMe,userController.getUser);
+
+router.use(authController.authorizeTO("admin"));
+router.route('/').get(userController.getAllUsers).post(userController.createUser);
 router.route('/:id').get(userController.getUser).patch(userController.updateUser).delete(userController.deleteUser);
 
 
