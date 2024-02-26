@@ -1,11 +1,14 @@
 const express=require('express');
+const path=require("path");
 const morgan=require('morgan');
 const AppError=require('./Utils/AppError');
 const ErrorHandler=require('./controllers/globalErrorHandler');
+const cookieParser = require('cookie-parser');
 
 const userRouter=require('./Routes/userRoutes');
 const tourRoutes=require('./Routes/tourRoutes');
 const reviewRoutes=require('./Routes/reviewRoutes');
+const viewRoutes=require('./Routes/viewRoutes');
 const app = express();
 const rateLimit =require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -15,6 +18,10 @@ const xss = require('xss-clean')
 if(process.env.NODE_ENV ==='development'){
     app.use(morgan('dev'));
 }
+
+app.set("views", path.join(__dirname, "views"));
+app.set('view engine', 'pug');
+app.use(express.static(path.join(__dirname, "public")));
 
 //prvent xss attacks
 app.use(xss());
@@ -30,11 +37,13 @@ const limiter = rateLimit({
 });
 
 app.use(limiter)
+app.use(cookieParser());
 
 app.use(express.json());
 
 
 
+app.use('/',viewRoutes);
 app.use('/api/v1/tours',tourRoutes);
 
 app.use('/api/v1/users',userRouter);

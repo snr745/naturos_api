@@ -20,6 +20,7 @@ const UserSchema=new mongoose.Schema({
         enum:['user','guide','lead-guide','admin'],
         default:'user'
     },
+    photo: String,
 
     password:{
         type:String,
@@ -48,7 +49,7 @@ UserSchema.pre('save',async function(next){
     if(!this.isModified("passWord")) {
         return next();
     } 
-    this.passWord=await bcrypt.hash(this.passWord,12);
+    //this.passWord=await bcrypt.hash(this.passWord,12);
 
     this.passWordConfirm=undefined;
     next();

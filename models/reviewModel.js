@@ -17,12 +17,12 @@ const reviewSchema= new mongoose.Schema({
         type:Date,
         default: Date.now()
       },
-      tour:[{type:mongoose.Schema.ObjectId,
+      tour:{type:mongoose.Schema.ObjectId,
         ref :'Tour',
-        required:[true,"tour cannot be empty"]}],
-  user:[{type:mongoose.Schema.ObjectId,
+        required:[true,"tour cannot be empty"]},
+  user:{type:mongoose.Schema.ObjectId,
             ref :'User',
-            required:[true,"user cannot be empty"]}]
+            required:[true,"user cannot be empty"]}
 
 },
 {
@@ -31,6 +31,7 @@ const reviewSchema= new mongoose.Schema({
   });
 
 reviewSchema.index({tour:1,user:1},{unique:true});
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
   reviewSchema.pre(/^find/,function(next){
     this.populate({

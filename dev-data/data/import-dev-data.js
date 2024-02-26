@@ -20,9 +20,8 @@ mongoose.connect(db).then(con=>{
 
 const importData=async ()=>{
     try{
-        await User.create(users,{validateBeforeSave: false});
         await Tour.create(tours);
-        
+        await User.create(users,{validateBeforeSave: false});
         await Review.create(reviews);
         console.log("Tour Data Created Successfully");
         process.exit();

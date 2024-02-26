@@ -10,6 +10,7 @@ const router=express.Router();
 
 router.route('/signup').post(authController.signUp);
 router.route('/logIn').post(authController.logIn);
+router.route('/logout').get(authController.logout);
 
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/updateMyPassword').patch(authController.protect,authController.updatePassword);

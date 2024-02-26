@@ -38,15 +38,14 @@ exports.signUp = catchAsync(async (req, res, next) => {
 });
 
 exports.logIn = catchAsync(async (req, res, next) => {
-  const { email, passWord } = req.body;
-  if (!email || !passWord) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return next(new AppError("Please enter correct password or email", 400));
   }
 
   const User = await user.findOne({ email }).select("+password");
-  console.log(User.password);
 
-  if (!User || !(await User.correctPassword(passWord, User.password))) {
+  if (!User || !(await User.correctPassword(password, User.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
 
@@ -134,6 +133,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(' ')[1];
+  }else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if(!token){
     next(new AppError(" Please Log in To get Acces",401));
@@ -153,9 +154,53 @@ exports.protect = catchAsync(async (req, res, next) => {
   if(currentUser.changedPassword(decoded.iat)){
     return next(new AppError("User recently changed Password",401));
   }
+   // THERE IS A LOGGED IN USER
+   res.locals.user = currentUser;
 req.user=currentUser;
   next();
 });
+
+// Only for rendered pages, no errors!
+exports.isLoggedIn = async (req, res, next) => {
+  console.log("currentUser");
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      console.log(decoded);
+      // 2) Check if user still exists
+      const currentUser = await user.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+      console.log("currentUser");
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.changedPassword(decoded.iat)) {
+        return next();
+      }
+      console.log("currentUser1");
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
+      console.log(currentUser);
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 exports.authorizeTO= (...roles)=>{
   return (req,res,next)=>{
